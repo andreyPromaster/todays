@@ -9,6 +9,8 @@ python = "^3.9"
 fastapi = "^0.78.0"
 SQLAlchemy = "^1.4.39"
 psycopg2-binary = "^2.9.3"
+alembic = "^1.8.0"
+email-validator = "^1.2.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"

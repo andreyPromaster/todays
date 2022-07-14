@@ -61,7 +61,7 @@ class User(Base):
     password = Column(Text(), nullable=False)
     image = Column(Text(), nullable=True)  # store image link
 
-    ratings = relationship("User", back_populates="user")
+    ratings = relationship("Rating", back_populates="user")
     filters = relationship("Filter")
 
 

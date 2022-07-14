@@ -1,5 +1,5 @@
+from api.views import source
 from fastapi import APIRouter
-from views import source
 
 api_router = APIRouter()
 

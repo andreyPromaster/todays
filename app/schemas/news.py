@@ -13,6 +13,9 @@ class Source(BaseModel):
     description: str
     logo: Union[FileUrl, None] = None
 
+    class Config:
+        orm_mode = True
+
 
 class Theme(BaseModel):
     id: int
@@ -40,7 +43,7 @@ class User(BaseModel):
 
 class Rating(BaseModel):
     id: int
-    value: conint(gt=0, lte=10)
+    value: conint(gt=0, le=10)
     created_at: datetime
     news: News
     user: User

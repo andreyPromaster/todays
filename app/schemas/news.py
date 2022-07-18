@@ -17,10 +17,21 @@ class Source(BaseModel):
         orm_mode = True
 
 
-class Theme(BaseModel):
-    id: int
+class ThemeBase(BaseModel):
     name: constr(max_length=255)
     description: Union[str, None] = None
+
+    class Config:
+        orm_mode = True
+
+
+class ThemeUpdate(ThemeBase):
+    name: Union[constr(max_length=255), None] = None
+    description: Union[str, None] = None
+
+
+class ThemeRetrieve(ThemeBase):
+    id: int
 
 
 class News(BaseModel):
@@ -31,7 +42,7 @@ class News(BaseModel):
     original_link: Union[HttpUrl, None] = None
     author: constr(max_length=100) = None
     source: Union[Source, None] = None
-    theme: Union[Theme, None] = None
+    theme: Union[ThemeRetrieve, None] = None
 
 
 class User(BaseModel):
@@ -52,5 +63,5 @@ class Rating(BaseModel):
 class Filter(BaseModel):
     id: int
     user: User
-    theme: Theme
+    theme: ThemeRetrieve
     applied_at: datetime

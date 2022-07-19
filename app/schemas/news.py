@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Union
 
-from pydantic import BaseModel, EmailStr, FileUrl, HttpUrl, conint, constr
+from core.auth.shemas import User
+from pydantic import BaseModel, FileUrl, HttpUrl, conint, constr
 
 UUID_LENGTH = 36
 
@@ -43,13 +44,6 @@ class News(BaseModel):
     author: constr(max_length=100) = None
     source: Union[Source, None] = None
     theme: Union[ThemeRetrieve, None] = None
-
-
-class User(BaseModel):
-    uid: constr(max_length=UUID_LENGTH)
-    email: EmailStr
-    password: str
-    image: Union[FileUrl, None] = None
 
 
 class Rating(BaseModel):

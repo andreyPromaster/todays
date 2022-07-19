@@ -12,6 +12,8 @@ psycopg2-binary = "^2.9.3"
 alembic = "^1.8.0"
 email-validator = "^1.2.1"
 uvicorn = {extras = ["standard"], version = "^0.18.2"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"

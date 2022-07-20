@@ -3,6 +3,7 @@ from typing import Any, Generic, List, Optional, Type, TypeVar
 from crud.base import ModelType
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
+from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -22,8 +23,44 @@ class RetrieveModelMixin(BaseMixin):
     def get(self, obj_id: Any, db: Session) -> Optional[ModelType]:
         return db.query(self.model).filter(self.model.id == obj_id).first()
 
-    def list(self, db: Session, skip: int, limit: int) -> List[ModelType]:
-        return db.query(self.model).offset(skip).limit(limit).all()
+    def get_by_any_field(
+        self, db: Session, field_name: str, field_value: str
+    ) -> Optional[ModelType]:
+        filters = {field_name: field_value}
+        if field_name in [column.name for column in inspect(self.model).c]:
+            return db.query(self.model).filter_by(**filters).first()
+
+    def list(
+        self,
+        db: Session,
+        skip: int,
+        limit: int,
+        filters: Optional[dict] = None,
+        ordering: Optional[list] = None,
+    ) -> List[ModelType]:
+        if filters is not None:
+            filters_keys = list(filters.keys())
+            for key in filters_keys:
+                if key not in [column.name for column in inspect(self.model).c]:
+                    filters.pop(key)
+        else:
+            filters = {}
+
+        if ordering is not None:
+            for field in ordering:
+                if field not in [column.name for column in inspect(self.model).c]:
+                    ordering.remove(field)
+        else:
+            ordering = []
+
+        return (
+            db.query(self.model)
+            .filter_by(**filters)
+            .order_by(*ordering)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
 
 class CreateModelMixin(BaseMixin, Generic[CreateSchemaType]):

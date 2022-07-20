@@ -1,7 +1,11 @@
-from typing import Union
+from typing import List, Union
 
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr, FileUrl, constr
+
+
+class Permissions(BaseModel):
+    name: str
 
 
 class User(BaseModel):
@@ -9,6 +13,7 @@ class User(BaseModel):
     email: EmailStr
     password: str
     image: Union[FileUrl, None] = None
+    permissions: List[Permissions] = []
 
 
 class Token(BaseModel):

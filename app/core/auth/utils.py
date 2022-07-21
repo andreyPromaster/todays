@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
-from string import punctuation
 
-from core.auth.exceptions import PasswordSecuryException, UserAlreadyExistsException
+from core.auth.exceptions import UserAlreadyExistsException
+from core.auth.shemas import RegistrationData
 from core.conf import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     SECRET_KEY,
@@ -10,7 +10,6 @@ from core.conf import (
 from db.models.news import User
 from jose import jwt
 from passlib.context import CryptContext
-from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -32,25 +31,12 @@ def generate_access_token(payload: dict) -> str:
     return encoded_jwt
 
 
-def is_password_secury(plain_password: str) -> bool:
-    if (
-        len(plain_password) >= 8
-        and any(map(str.isupper, plain_password))
-        and any(map(str.isdigit, plain_password))
-        and any(map(lambda item: item in punctuation, plain_password))
-    ):
-        return True
-    return False
-
-
-def create_user(db: Session, email: EmailStr, password: str) -> User:
+def create_user(db: Session, user: RegistrationData) -> User:
     """Replace logic in crud operation"""
-    is_email_exists = db.query(User).filter(User.email == email).exists()
+    is_email_exists = db.query(User).filter(User.email == user.email).exists()
     if is_email_exists:
-        raise UserAlreadyExistsException(f"User with email {email} already exists")
-    if is_password_secury(password):
-        raise PasswordSecuryException("Password is too easy")
-    user = User(email=email, password=get_password_hash(password))
+        raise UserAlreadyExistsException(f"User with email {user.email} already exists")
+    user = User(email=user.email, password=get_password_hash(user.password))
     db.add(user)
     db.commit()
     db.refresh(user)

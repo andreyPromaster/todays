@@ -43,7 +43,7 @@ def is_password_secury(plain_password: str) -> bool:
     return False
 
 
-def create_user(db: Session, email: EmailStr, password: str):
+def create_user(db: Session, email: EmailStr, password: str) -> User:
     """Replace logic in crud operation"""
     is_email_exists = db.query(User).filter(User.email == email).exists()
     if is_email_exists:

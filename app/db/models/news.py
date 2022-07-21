@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from db.models.utils import get_connection_engine
-from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import Column, ForeignKey, String, Table
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -53,6 +53,14 @@ class Rating(Base):
     user = relationship("User", back_populates="ratings")
 
 
+association_premission_table = Table(
+    "association_permission",
+    Base.metadata,
+    Column("user_uid", ForeignKey("user.uid"), primary_key=True),
+    Column("permission_id", ForeignKey("permission.id"), primary_key=True),
+)
+
+
 class User(Base):
     __tablename__ = "user"
 
@@ -61,8 +69,16 @@ class User(Base):
     password = Column(Text(), nullable=False)
     image = Column(Text(), nullable=True)  # store image link
 
+    permissions = relationship("Permission", secondary=association_premission_table)
     ratings = relationship("Rating", back_populates="user")
     filters = relationship("Filter")
+
+
+class Permission(Base):
+    __tablename__ = "permission"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False, unique=True)
 
 
 class Theme(Base):

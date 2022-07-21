@@ -26,7 +26,7 @@ class Source(Base):
 class News(Base):
     __tablename__ = "news"
 
-    uid = Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    uid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     slug = Column(String(255), nullable=False)
     text = Column(Text(), nullable=False)
     uploaded_at = Column(DateTime(), nullable=False, default=datetime.now)
@@ -47,7 +47,7 @@ class Rating(Base):
     value = Column(SmallInteger(), nullable=False)
     created_at = Column(DateTime(), nullable=False, default=datetime.now)
     news_uid = Column(UUID, ForeignKey("news.uid"), nullable=False)
-    user_uid = Column(UUID, ForeignKey("user.uid"), nullable=False)
+    user_id = Column(Integer, ForeignKey("todays_user.id"), nullable=False)
 
     news = relationship("News", back_populates="ratings")
     user = relationship("User", back_populates="ratings")
@@ -56,15 +56,15 @@ class Rating(Base):
 association_premission_table = Table(
     "association_permission",
     Base.metadata,
-    Column("user_uid", ForeignKey("user.uid"), primary_key=True),
+    Column("user_id", ForeignKey("todays_user.id"), primary_key=True),
     Column("permission_id", ForeignKey("permission.id"), primary_key=True),
 )
 
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "todays_user"
 
-    uid = Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    id = Column(Integer, primary_key=True)
     email = Column(Text(), nullable=False, unique=True)
     password = Column(Text(), nullable=False)
     image = Column(Text(), nullable=True)  # store image link
@@ -95,5 +95,5 @@ class Filter(Base):
 
     id = Column(Integer, primary_key=True)
     theme_id = Column(Integer, ForeignKey("theme.id"), nullable=False)
-    user_uid = Column(UUID, ForeignKey("user.uid"), nullable=False)
+    user_id = Column(Integer, ForeignKey("todays_user.id"), nullable=False)
     applied_at = Column(DateTime(), nullable=False, default=datetime.now)

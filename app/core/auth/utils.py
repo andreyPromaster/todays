@@ -33,7 +33,9 @@ def generate_access_token(payload: dict) -> str:
 
 def create_user(db: Session, user: RegistrationData) -> User:
     """Replace logic in crud operation"""
-    is_email_exists = db.query(User).filter(User.email == user.email).exists()
+    breakpoint()
+
+    is_email_exists = db.query(db.query(User).filter(User.email == user.email).exists()).scalar()
     if is_email_exists:
         raise UserAlreadyExistsException(f"User with email {user.email} already exists")
     user = User(email=user.email, password=get_password_hash(user.password))

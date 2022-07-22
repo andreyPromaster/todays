@@ -17,7 +17,7 @@ class CRUDTheme(
     all methods for work with db with model Theme
     """
 
-    def filter_by_name_partial(self, db: Session, name: str) -> List[ModelType]:
+    def filter_by_partial_name(self, db: Session, name: str) -> List[ModelType]:
         queryset = db.query(self.model).filter(self.model.name.contains(name)).all()
         return queryset
 

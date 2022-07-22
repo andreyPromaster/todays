@@ -11,7 +11,7 @@ router = APIRouter()
 
 @router.get("/{theme_id}", response_model=schemas.ThemeRetrieve)
 def get_theme(theme_id: int, db: Session = Depends(get_db)):
-    theme = crud.theme.get(db=db, obj_id=theme_id)
+    theme = crud.theme.get(db=db, field_name="id", field_value=theme_id)
     if theme is None:
         raise HTTPException(status_code=404, detail="Theme not found")
     return theme
@@ -25,7 +25,7 @@ def get_all_themes(db: Session = Depends(get_db), skip: int = 0, limit: int = 10
 
 @router.post("/", response_model=schemas.ThemeRetrieve)
 def create_theme(theme: schemas.ThemeBase, db: Session = Depends(get_db)):
-    theme_exists = crud.theme.get_by_any_field(db=db, field_name="name", field_value=theme.name)
+    theme_exists = crud.theme.get(db=db, field_name="name", field_value=theme.name)
     if theme_exists:
         raise HTTPException(status_code=400, detail=f"Theme with name {theme.name} already exists")
     theme = crud.theme.create(db=db, obj_in=theme)
@@ -34,7 +34,7 @@ def create_theme(theme: schemas.ThemeBase, db: Session = Depends(get_db)):
 
 @router.put("/{theme_id}", response_model=schemas.ThemeRetrieve)
 def update_theme(update_data: schemas.ThemeUpdate, theme_id: int, db: Session = Depends(get_db)):
-    theme = crud.theme.get(db=db, obj_id=theme_id)
+    theme = crud.theme.get(db=db, field_name="id", field_value=theme_id)
     if not theme:
         raise HTTPException(status_code=404, detail="Theme not found")
 
@@ -44,7 +44,7 @@ def update_theme(update_data: schemas.ThemeUpdate, theme_id: int, db: Session = 
 
 @router.delete("/{theme_id}", response_model=schemas.ThemeRetrieve)
 def delete_theme(theme_id: int, db: Session = Depends(get_db)):
-    theme = crud.theme.get(db=db, obj_id=theme_id)
+    theme = crud.theme.get(db=db, field_name="id", field_value=theme_id)
     if not theme:
         raise HTTPException(status_code=404, detail="Theme not found")
 

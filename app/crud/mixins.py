@@ -17,13 +17,15 @@ class HandlerMixin:
         return inspect(self.model).c
 
     def is_field_exists(self, field_name: str):
-        return field_name in self.model_fields.keys()
+        if field_name not in self.model_fields.keys():
+            raise Exception(f"field <{field_name}> doesn't exist for model {self.model}")
 
     def is_field_unique(self, field_name: str):
-        return (
+        if not (
             self.model_fields.get(field_name).primary_key
             or self.model_fields.get(field_name).unique
-        )
+        ):
+            raise Exception(f"field <{field_name}> is not unique for {self.model}")
 
     def init_get_list_parameters(
         self,
@@ -31,26 +33,14 @@ class HandlerMixin:
         ordering: Optional[list] = None,
         select_fields: Optional[list] = None,
     ):
-        if filters is not None:
-            for field in filters.keys():
-                if not self.is_field_exists(field):
-                    filters.pop(field)
-        else:
+
+        if filters is None:
             filters = {}
 
-        if ordering is not None:
-            for field in ordering:
-                if not self.is_field_exists(field):
-                    ordering.remove(field)
-        else:
+        if ordering is None:
             ordering = []
 
-        if select_fields is not None:
-            for field in select_fields:
-                if not self.is_field_exists(field):
-                    select_fields.remove(field)
-
-        else:
+        if select_fields is None:
             select_fields = self.model_fields.keys()
 
         return {"filters": filters, "ordering": ordering, "select_fields": select_fields}
@@ -62,9 +52,10 @@ class RetrieveModelMixin(HandlerMixin):
     """
 
     def get(self, db: Session, field_name: str, field_value: Any) -> Optional[ModelType]:
-        if self.is_field_exists(field_name) and self.is_field_unique(field_name):
-            filters = {field_name: field_value}
-            return db.query(self.model).filter_by(**filters).first()
+        self.is_field_exists(field_name)
+        self.is_field_unique(field_name)
+        filters = {field_name: field_value}
+        return db.query(self.model).filter_by(**filters).first()
 
     def list(
         self,

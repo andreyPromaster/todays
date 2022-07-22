@@ -1,6 +1,7 @@
-from typing import Any, Generic, List, Optional, TypeVar
+from typing import Any, Generic, List, Optional, Tuple, TypeVar
 
 from crud.base import ModelType
+from crud.exceptions import WrongModelFieldException
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy import inspect
@@ -18,21 +19,23 @@ class HandlerMixin:
 
     def is_field_exists(self, field_name: str):
         if field_name not in self.model_fields.keys():
-            raise Exception(f"field <{field_name}> doesn't exist for model {self.model}")
+            raise WrongModelFieldException(
+                f"field <{field_name}> doesn't exist for model {self.model}"
+            )
 
     def is_field_unique(self, field_name: str):
         if not (
             self.model_fields.get(field_name).primary_key
             or self.model_fields.get(field_name).unique
         ):
-            raise Exception(f"field <{field_name}> is not unique for {self.model}")
+            raise WrongModelFieldException(f"field <{field_name}> is not unique for {self.model}")
 
-    def init_get_list_parameters(
+    def init_list_parameters(
         self,
         filters: Optional[dict] = None,
         ordering: Optional[list] = None,
         select_fields: Optional[list] = None,
-    ):
+    ) -> Tuple:
 
         if filters is None:
             filters = {}
@@ -43,7 +46,7 @@ class HandlerMixin:
         if select_fields is None:
             select_fields = self.model_fields.keys()
 
-        return {"filters": filters, "ordering": ordering, "select_fields": select_fields}
+        return filters, ordering, select_fields
 
 
 class RetrieveModelMixin(HandlerMixin):
@@ -67,9 +70,9 @@ class RetrieveModelMixin(HandlerMixin):
         select_fields: Optional[list] = None,
     ) -> List[ModelType]:
 
-        filters = self.init_get_list_parameters(filters)["filters"]
-        ordering = self.init_get_list_parameters(ordering)["ordering"]
-        select_fields = self.init_get_list_parameters(select_fields)["select_fields"]
+        filters, ordering, select_fields = self.init_list_parameters(
+            filters, ordering, select_fields
+        )
 
         return (
             db.query(self.model)

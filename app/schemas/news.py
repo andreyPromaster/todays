@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import Union
 
-from core.auth.shemas import User
 from pydantic import BaseModel, FileUrl, HttpUrl, conint, constr
+
+from app.core.auth.schemas import User
 
 UUID_LENGTH = 36
 

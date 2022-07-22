@@ -8,3 +8,7 @@ class PasswordSecuryException(AuthBaseException):
 
 class UserAlreadyExistsException(AuthBaseException):
     """Raise if user create the same account"""
+
+
+class AccessDeniedException(AuthBaseException):
+    """Raise if authentication was failed"""

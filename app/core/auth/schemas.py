@@ -4,7 +4,12 @@ from typing import List, Union
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr, FileUrl, constr, validator
 
-MIN_PASSWORD_LENTH = 8
+MIN_PASSWORD_LENGTH = 8
+
+
+class EmailPasswordRequestForm(BaseModel):
+    email: EmailStr
+    password: str
 
 
 class Permissions(BaseModel):
@@ -14,9 +19,11 @@ class Permissions(BaseModel):
 class User(BaseModel):
     id: int
     email: EmailStr
-    password: str
     image: Union[FileUrl, None] = None
     permissions: List[Permissions] = []
+
+    class Config:
+        orm_mode = True
 
 
 class UserOut(BaseModel):
@@ -39,31 +46,31 @@ class TokenData(BaseModel):
 
 class RegistrationData(BaseModel):
     email: EmailStr
-    password: constr(min_length=MIN_PASSWORD_LENTH)
-    second_password: constr(min_length=MIN_PASSWORD_LENTH)
+    password: constr(min_length=MIN_PASSWORD_LENGTH)
+    second_password: constr(min_length=MIN_PASSWORD_LENGTH)
 
     @validator("second_password")
-    def passwords_match(cls, v, values, **kwargs):
-        if v != values["password"]:
+    def passwords_match(cls, value, values, **kwargs):
+        if value != values["password"]:
             raise ValueError("Passwords do not match")
-        return v
+        return value
 
     @validator("password")
-    def password_must_contain_digit(cls, v, values, **kwargs):
-        assert any(map(str.isdigit, v)), "Password must contain digit"
-        return v
+    def password_must_contain_digit(cls, password):
+        assert any(map(str.isdigit, password)), "Password must contain digit"
+        return password
 
     @validator("password")
-    def password_must_contain_upper(cls, v, values, **kwargs):
-        assert any(map(str.isupper, v)), "Password must contain uppercase symbol"
-        return v
+    def password_must_contain_upper(cls, password):
+        assert any(map(str.isupper, password)), "Password must contain uppercase symbol"
+        return password
 
     @validator("password")
-    def password_must_contain_specials(cls, v, values, **kwargs):
+    def password_must_contain_specials(cls, password):
         assert any(
-            map(lambda item: item in punctuation, v)
-        ), "Password must contain uppercase symbol"
-        return v
+            map(lambda item: item in punctuation, password)
+        ), "Password must contain specials symbol"
+        return password
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

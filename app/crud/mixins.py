@@ -16,10 +16,10 @@ class HandlerMixin:
         """return all self model fields metadata"""
         return inspect(self.model).c
 
-    def field_exists(self, field_name: str):
+    def is_field_exists(self, field_name: str):
         return field_name in self.model_fields.keys()
 
-    def field_is_unique(self, field_name: str):
+    def is_field_unique(self, field_name: str):
         return (
             self.model_fields.get(field_name).primary_key
             or self.model_fields.get(field_name).unique
@@ -33,21 +33,21 @@ class HandlerMixin:
     ):
         if filters is not None:
             for field in filters.keys():
-                if not self.field_exists(field):
+                if not self.is_field_exists(field):
                     filters.pop(field)
         else:
             filters = {}
 
         if ordering is not None:
             for field in ordering:
-                if not self.field_exists(field):
+                if not self.is_field_exists(field):
                     ordering.remove(field)
         else:
             ordering = []
 
         if select_fields is not None:
             for field in select_fields:
-                if not self.field_exists(field):
+                if not self.is_field_exists(field):
                     select_fields.remove(field)
 
         else:
@@ -62,7 +62,7 @@ class RetrieveModelMixin(HandlerMixin):
     """
 
     def get(self, db: Session, field_name: str, field_value: Any) -> Optional[ModelType]:
-        if self.field_exists(field_name) and self.field_is_unique(field_name):
+        if self.is_field_exists(field_name) and self.is_field_unique(field_name):
             filters = {field_name: field_value}
             return db.query(self.model).filter_by(**filters).first()
 

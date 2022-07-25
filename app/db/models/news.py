@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from db.models.utils import get_connection_engine
-from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import Column, ForeignKey, String, Table
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -26,7 +26,7 @@ class Source(Base):
 class News(Base):
     __tablename__ = "news"
 
-    uid = Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    uid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     slug = Column(String(255), nullable=False)
     text = Column(Text(), nullable=False)
     uploaded_at = Column(DateTime(), nullable=False, default=datetime.now)
@@ -47,22 +47,38 @@ class Rating(Base):
     value = Column(SmallInteger(), nullable=False)
     created_at = Column(DateTime(), nullable=False, default=datetime.now)
     news_uid = Column(UUID, ForeignKey("news.uid"), nullable=False)
-    user_uid = Column(UUID, ForeignKey("user.uid"), nullable=False)
+    user_id = Column(Integer, ForeignKey("todays_user.id"), nullable=False)
 
     news = relationship("News", back_populates="ratings")
     user = relationship("User", back_populates="ratings")
 
 
-class User(Base):
-    __tablename__ = "user"
+association_premission_table = Table(
+    "association_permission",
+    Base.metadata,
+    Column("user_id", ForeignKey("todays_user.id"), primary_key=True),
+    Column("permission_id", ForeignKey("permission.id"), primary_key=True),
+)
 
-    uid = Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+
+class User(Base):
+    __tablename__ = "todays_user"
+
+    id = Column(Integer, primary_key=True)
     email = Column(Text(), nullable=False, unique=True)
     password = Column(Text(), nullable=False)
     image = Column(Text(), nullable=True)  # store image link
 
+    permissions = relationship("Permission", secondary=association_premission_table)
     ratings = relationship("Rating", back_populates="user")
     filters = relationship("Filter")
+
+
+class Permission(Base):
+    __tablename__ = "permission"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False, unique=True)
 
 
 class Theme(Base):
@@ -79,5 +95,5 @@ class Filter(Base):
 
     id = Column(Integer, primary_key=True)
     theme_id = Column(Integer, ForeignKey("theme.id"), nullable=False)
-    user_uid = Column(UUID, ForeignKey("user.uid"), nullable=False)
+    user_id = Column(Integer, ForeignKey("todays_user.id"), nullable=False)
     applied_at = Column(DateTime(), nullable=False, default=datetime.now)

@@ -1,7 +1,7 @@
 from typing import Any, Generic, List, Optional, Tuple, TypeVar
 
 from crud.base import ModelType
-from crud.exceptions import WrongModelFieldException
+from crud.exceptions import FieldDoesNotExistException, FieldIsNotUniqueException
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy import inspect
@@ -19,7 +19,7 @@ class HandlerMixin:
 
     def is_field_exists(self, field_name: str):
         if field_name not in self.model_fields.keys():
-            raise WrongModelFieldException(
+            raise FieldDoesNotExistException(
                 f"field <{field_name}> doesn't exist for model {self.model}"
             )
 
@@ -28,14 +28,14 @@ class HandlerMixin:
             self.model_fields.get(field_name).primary_key
             or self.model_fields.get(field_name).unique
         ):
-            raise WrongModelFieldException(f"field <{field_name}> is not unique for {self.model}")
+            raise FieldIsNotUniqueException(f"field <{field_name}> is not unique for {self.model}")
 
     def init_list_parameters(
         self,
         filters: Optional[dict] = None,
         ordering: Optional[list] = None,
         select_fields: Optional[list] = None,
-    ) -> Tuple:
+    ) -> Tuple[dict, list, list]:
 
         if filters is None:
             filters = {}

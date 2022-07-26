@@ -10,6 +10,7 @@ router = APIRouter()
 
 @router.post("/register/", response_model=UserOut)
 def register(requested_user: RegistrationData, db: Session = Depends(get_db)):
+    breakpoint()
     try:
         user = create_user(db, requested_user)
     except AuthBaseException as e:

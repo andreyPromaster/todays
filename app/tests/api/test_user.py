@@ -1,18 +1,13 @@
-from factories import UserFactory
-from fastapi.testclient import TestClient
-from main import app
-
-client = TestClient(app)
+#  from factories import UserFactory
+from utils import client
 
 
 def test_user_registration(db_session):
-    breakpoint()
-    user = UserFactory()
-    print(user)
+    #  user = UserFactory()
     response = client.post(
         "/register/",
         json={
-            "email": "User-test-0@mail.com",
+            "email": "User-test-1@mail.com",
             "password": "12sdfa!EF3",
             "second_password": "12sdfa!EF3",
         },

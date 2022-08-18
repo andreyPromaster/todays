@@ -26,9 +26,12 @@ def get_all_themes(db: Session = Depends(get_db), skip: int = 0, limit: int = 10
 @router.post("/", response_model=schemas.ThemeRetrieve)
 def create_theme(theme: schemas.ThemeBase, db: Session = Depends(get_db)):
     theme_exists = crud.theme.get(db=db, field_name="name", field_value=theme.name)
+    breakpoint()
     if theme_exists:
         raise HTTPException(status_code=400, detail=f"Theme with name {theme.name} already exists")
+    breakpoint()
     theme = crud.theme.create(db=db, obj_in=theme)
+    breakpoint()
     return theme
 
 

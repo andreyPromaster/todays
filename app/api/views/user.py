@@ -24,7 +24,7 @@ def login(form_data: EmailPasswordRequestForm, db: Session = Depends(get_db)):
     except AccessDeniedException:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail={"detail": "Incorrect email or password"},
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = generate_access_token({"sub": user.email})

@@ -85,7 +85,7 @@ class Theme(Base):
     __tablename__ = "theme"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False)
+    name = Column(String(255), nullable=False, unique=True)
     description = Column(Text(), nullable=True)
     news = relationship("News", back_populates="theme")
 

@@ -8,7 +8,7 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 from utils import TestingSessionLocal, engine, override_get_db
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def setup_db():
     if not database_exists(engine.url):
         create_database(engine.url)
@@ -22,15 +22,13 @@ def setup_db():
     drop_database(engine.url)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def db_session(setup_db):
     session = TestingSessionLocal(bind=setup_db)
     app.dependency_overrides[get_db] = override_get_db
     yield session
-
+    session.rollback()
     # Cleanup database
-    breakpoint()
-
     with contextlib.closing(engine.connect()) as connection:
         transaction = connection.begin()
         for table in reversed(Base.metadata.sorted_tables):

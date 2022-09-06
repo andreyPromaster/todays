@@ -3,7 +3,7 @@ from utils import client
 
 
 def test_success_user_registration(db_session):
-    fake_user = UserFactory.build(email="User-test@mail.com", password="12sdfa!EF3")
+    fake_user = UserFactory(db_session).build(email="User-test@mail.com", password="12sdfa!EF3")
     response = client.post(
         "/register/",
         json={
@@ -20,7 +20,7 @@ def test_success_user_registration(db_session):
 
 
 def test_not_the_same_password_user_registration(db_session):
-    fake_user = UserFactory.build(email="User-test@mail.com", password="12sdfa!EF3")
+    fake_user = UserFactory(db_session).build(email="User-test@mail.com", password="12sdfa!EF3")
     response = client.post(
         "/register/",
         json={
@@ -36,7 +36,7 @@ def test_not_the_same_password_user_registration(db_session):
 
 
 def test_registration_user_already_exists(db_session):
-    fake_user = UserFactory(email="User-test@mail.com", password="12sdfa!EF3")
+    fake_user = UserFactory(db_session).create(email="User-test@mail.com", password="12sdfa!EF3")
     response = client.post(
         "/register/",
         json={
@@ -45,6 +45,7 @@ def test_registration_user_already_exists(db_session):
             "second_password": fake_user.password,
         },
     )
-    assert response.status_code == 401
+
+    assert response.status_code == 400
     payload = response.json()
-    assert payload["detail"] == "Incorrect email or password"
+    assert payload["detail"] == f"User with email {fake_user.email} already exists"

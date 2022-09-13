@@ -3,6 +3,6 @@ from tests.utils import client
 
 
 def test_get_theme(db_session):
-    theme = ThemeFactory()
-    response = client.get(f"/theme/{theme.id}")
-    assert response.status_code == 201
+    theme = ThemeFactory(db_session)()
+    response = client.get(f"/themes/{theme.id}")
+    assert response.status_code == 200

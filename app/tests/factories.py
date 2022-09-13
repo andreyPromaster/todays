@@ -17,11 +17,13 @@ def UserFactory(session: Session):
     return _UserFactory
 
 
-class ThemeFactory(factory.alchemy.SQLAlchemyModelFactory):
-    class Meta:
-        model = Theme
-        sqlalchemy_session_persistence = "commit"
-        sqlalchemy_session = TestingSessionLocal()
+def ThemeFactory(session: Session):
+    class _ThemeFactory(factory.alchemy.SQLAlchemyModelFactory):
+        class Meta:
+            model = Theme
+            sqlalchemy_session_persistence = "commit"
+            sqlalchemy_session = session
 
-    name = factory.Sequence(lambda n: f"Theme-{n}")
-    description = "Theme description"
+        name = factory.Sequence(lambda n: f"Theme-{n}")
+        description = "Theme description"
+    return _ThemeFactory

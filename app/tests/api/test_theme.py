@@ -57,8 +57,8 @@ def test_delete_theme(db_session):
     response = client.delete(f"/themes/{theme.id}")
 
     themes = db_session.query(Theme).all()
-
     assert response.status_code == 200
+    assert response.json() == {"name": theme.name, "description": theme.description, "id": theme.id}
     assert themes == []
 
 

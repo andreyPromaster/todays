@@ -8,6 +8,7 @@ def test_get_theme(db_session):
     theme = ThemeFactory(db_session).create()
     response = client.get(f"/themes/{theme.id}")
     assert response.status_code == 200
+    assert response.json() == {"name": theme.name, "description": theme.description, "id": theme.id}
 
 
 @pytest.mark.parametrize("count", [0, 5, 10])

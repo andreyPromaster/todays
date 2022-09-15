@@ -32,7 +32,7 @@ def test_create_new_theme(db_session, data, expected_value):
     )
     expected_theme = db_session.query(Theme).first()
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert expected_theme.name == theme["name"]
     assert expected_theme.description == expected_value
 
@@ -48,3 +48,22 @@ def test_update_theme(db_session):
     assert response.status_code == 200
     assert expected_theme.name == update_name
     assert expected_theme.description == theme.description
+
+
+def test_delete_theme(db_session):
+    theme = ThemeFactory(db_session).create()
+
+    response = client.delete(f"/themes/{theme.id}")
+
+    themes = db_session.query(Theme).all()
+
+    assert response.status_code == 200
+    assert themes == []
+
+
+def test_create_new_theme_which_exists(db_session):
+    theme = ThemeFactory(db_session).create()
+    response = client.post("/themes/", json={"name": theme.name})
+
+    assert response.status_code == 400
+    assert response.json() == {"detail": f"Theme with name {theme.name} already exists"}

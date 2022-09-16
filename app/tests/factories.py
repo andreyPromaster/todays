@@ -1,7 +1,6 @@
 import factory
 from db.models.news import Theme, User
 from sqlalchemy.orm import Session
-from tests.utils import TestingSessionLocal
 
 
 def UserFactory(session: Session):
@@ -26,4 +25,5 @@ def ThemeFactory(session: Session):
 
         name = factory.Sequence(lambda n: f"Theme-{n}")
         description = "Theme description"
+
     return _ThemeFactory

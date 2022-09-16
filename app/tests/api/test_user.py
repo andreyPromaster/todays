@@ -1,5 +1,5 @@
-from factories import UserFactory
-from utils import client
+from tests.factories import UserFactory
+from tests.utils import client
 
 
 def test_success_user_registration(db_session):

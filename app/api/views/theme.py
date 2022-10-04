@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 router = APIRouter()
 
 
-@router.get("/{theme_id}", response_model=schemas.ThemeRetrieve)
+@router.get("/{theme_id}", response_model=schemas.ThemeRetrieve, status_code=200)
 def get_theme(theme_id: int, db: Session = Depends(get_db)):
     theme = crud.theme.get(db=db, field_name="id", field_value=theme_id)
     if theme is None:
@@ -17,13 +17,13 @@ def get_theme(theme_id: int, db: Session = Depends(get_db)):
     return theme
 
 
-@router.get("/", response_model=List[schemas.ThemeRetrieve])
+@router.get("/", response_model=List[schemas.ThemeRetrieve], status_code=200)
 def get_all_themes(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
     themes_list = crud.theme.list(db=db, skip=skip, limit=limit)
     return themes_list
 
 
-@router.post("/", response_model=schemas.ThemeRetrieve)
+@router.post("/", response_model=schemas.ThemeRetrieve, status_code=201)
 def create_theme(theme: schemas.ThemeBase, db: Session = Depends(get_db)):
     theme_exists = crud.theme.get(db=db, field_name="name", field_value=theme.name)
     if theme_exists:
@@ -32,7 +32,7 @@ def create_theme(theme: schemas.ThemeBase, db: Session = Depends(get_db)):
     return theme
 
 
-@router.put("/{theme_id}", response_model=schemas.ThemeRetrieve)
+@router.put("/{theme_id}", response_model=schemas.ThemeRetrieve, status_code=200)
 def update_theme(update_data: schemas.ThemeUpdate, theme_id: int, db: Session = Depends(get_db)):
     theme = crud.theme.get(db=db, field_name="id", field_value=theme_id)
     if not theme:
@@ -42,7 +42,7 @@ def update_theme(update_data: schemas.ThemeUpdate, theme_id: int, db: Session = 
     return updated_theme
 
 
-@router.delete("/{theme_id}", response_model=schemas.ThemeRetrieve)
+@router.delete("/{theme_id}", response_model=schemas.ThemeRetrieve, status_code=200)
 def delete_theme(theme_id: int, db: Session = Depends(get_db)):
     theme = crud.theme.get(db=db, field_name="id", field_value=theme_id)
     if not theme:

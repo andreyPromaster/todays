@@ -16,8 +16,8 @@ def get_connection_engine() -> Engine:
     return conn
 
 
-def configurate_database_connection_string() -> str:
-    setting = PostgreSQLSettings()
+def configurate_database_connection_string(**kwargs) -> str:
+    setting = PostgreSQLSettings(**kwargs)
     return (
         f"postgresql://{setting.NEWS_DB_USER}:{setting.NEWS_DB_PASSWORD}"
         f"@{setting.NEWS_DB_HOST}:{setting.NEWS_DB_PORT}/{setting.NEWS_DB_NAME}"

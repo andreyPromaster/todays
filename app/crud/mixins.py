@@ -92,7 +92,7 @@ class CreateModelMixin(Generic[CreateSchemaType]):
 
     def create(self, db: Session, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
-        obj = self.model(obj_in_data)
+        obj = self.model(**obj_in_data)
         db.add(obj)
         db.commit()
         db.refresh(obj)

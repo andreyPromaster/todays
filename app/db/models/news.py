@@ -31,7 +31,7 @@ class News(Base):
     text = Column(Text(), nullable=False)
     uploaded_at = Column(DateTime(), nullable=False, default=datetime.now)
     created_at = Column(DateTime(), nullable=False, default=datetime.now)
-    original_link = Column(String(255), nullable=True, index=True)
+    original_link = Column(String(255), nullable=False, unique=True)
     author = Column(String(100), nullable=True)
     source_id = Column(Integer, ForeignKey("source.id"))
     theme_id = Column(Integer, ForeignKey("theme.id"))

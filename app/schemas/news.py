@@ -41,7 +41,7 @@ class News(BaseModel):
     text: Optional[str] = ""
     uploaded_at: datetime
     created_at: datetime
-    original_link: Union[HttpUrl, None] = None
+    original_link: HttpUrl
     author: constr(max_length=100) = None
     source: Union[Source, None] = None
     theme: Union[ThemeRetrieve, None] = None

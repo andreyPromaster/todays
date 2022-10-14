@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import Union
+from typing import Optional, Union
 
 from core.auth.schemas import User
-from pydantic import BaseModel, FileUrl, HttpUrl, conint, constr
+from pydantic import BaseModel, FileUrl, HttpUrl, conint, constr, validator
 
 UUID_LENGTH = 36
 
@@ -38,12 +38,17 @@ class ThemeRetrieve(ThemeBase):
 class News(BaseModel):
     uid: constr(max_length=UUID_LENGTH)
     slug: constr(max_length=255)
-    text: str
+    text: Optional[str] = ""
     uploaded_at: datetime
-    original_link: Union[HttpUrl, None] = None
+    created_at: datetime
+    original_link: HttpUrl
     author: constr(max_length=100) = None
     source: Union[Source, None] = None
     theme: Union[ThemeRetrieve, None] = None
+
+    @validator("text", pre=True, always=True)
+    def set_text(cls, name):
+        return ""
 
 
 class Rating(BaseModel):
